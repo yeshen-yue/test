@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="lib/jquery/jquery.min.js"></script>
+    <style>
+        /*   html {
+            font-size: 40px;
+        } */
+
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            width: 10rem;
+            height: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .box {
+            display: flex;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .item {
+            height: 100px;
+            flex: auto;
+        }
+
+        .item.red {
+            background-color: #f00;
+        }
+
+        .blue {
+            background-color: #00f;
+        }
+
+        .green {
+            background-color: #0f0;
+        }
+
+        .page {
+            position: absolute;
+            left: 4rem;
+            bottom: 10px;
+            width: 3rem;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .dot {
+            width: 0.8rem;
+            height: 0.8rem;
+            border-radius: 50%;
+            background-color: #fff;
+        }
+
+        .active {
+            background-image: radial-gradient(#333 30%, #fff 30%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="box">
+            <div class="item red">1</div>
+            <div class="item blue">2</div>
+            <div class="item green">3</div>
+            <div class="item red">1</div>
+        </div>
+        <div class="page">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <script>
+        document.documentElement.style.fontSize = screen.width / 10 + 'px';
+        let box = document.querySelector(".box");
+        let dots = document.querySelectorAll(".dot");
+        let itemNum = box.children.length;
+        box.style.width = `${itemNum}00%`;
+        let _w = box.children[0].offsetWidth;
+        let index = 0;
+        window.onresize = function () {
+            document.documentElement.style.fontSize = screen.width / 10 + 'px';
+        }
+
+        box.ontouchstart = function (e) {
+            console.log(screen.width);
+            console.log(_w);
+            let startX = e.touches[0].pageX;
+            box.ontouchend = function (ev) {
+                let endX = ev.changedTouches[0].pageX;
+                let distance = endX - startX;
+                let direction = distance > 0 ? 'right' : 'left';
+                box.style.transition = 'left 0.3s';
+                if (Math.abs(distance) > _w / 3) {
+                    index += direction == 'right' ? -1 : 1;
+                    box.style.left = -index * _w + 'px';
+                } else {
+                    box.style.left = -index * _w + 'px';
+                }
+                dots.forEach((item, i) => {
+                    if (index == 3 && i == 0) {
+                        item.className = 'dot active';
+                    } else {
+                        item.className = i == index ? 'dot active' : 'dot';
+                    }
+                })
+            }
+            box.ontouchmove = function (ev) {
+                let endX = ev.changedTouches[0].pageX;
+                let distance = endX - startX;
+                let direction = distance > 0 ? 'right' : 'left';
+                box.style.transition = '';
+                //设定index极限值
+                if (index == box.children.length - 1 && direction == 'left') {
+                    index = 0;
+                    box.style.left = -index * _w + 'px';
+                }
+                if (index == 0 && direction == 'right') {
+                    index = box.children.length - 1;
+                    box.style.left = -index * _w + 'px';
+                }
+                box.style.left = -index * _w + distance + 'px';
+            }
+
+        }
+    </script>
+</body>
+
+</html>
